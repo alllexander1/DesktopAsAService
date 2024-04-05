@@ -5,7 +5,8 @@ const websocketOptions = {
 };
 
 const guacdOptions = {
-    host: '192.168.178.31',
+    //host: '192.168.178.31',
+    host: 'localhost',
     port: 4822 // guacd server port
 };
 
