@@ -5,8 +5,8 @@ class GuacamoleStage extends React.Component {
 
     // Connection tokens, ToDo: implement better solution
     conn = {
-        'C1': 'eyJpdiI6IkhLTkMyLzgwdWN4cEJTdXhMZDl6bFE9PSIsInZhbHVlIjoiT2tuVHR2UzVWQk1zc2pXU1M5djI2YUpGdUxabjczZUFxeXJyanY4UTlUditmU2N5MlRhWkZId2hFNFNnd3VMeS90UzIvR2RuVFBYT0VwTjdFTWtJOE5GWHlEa3U0RTQ2N3V3N09Sc0pwYUxpL0ROY2U2ajhGcmg0R1VwRE83amw3SnFPV2ZRT0M0RW55NytITFRwUkxLeFNXMEswNk5xOGNUc3FiRCswRzZ2M29lNm1wZm5XcUxoUVV5SnNDTkR0V2hpN25rcFdzZ1FCd3dmTURRemxVWlFrZkVRZmU3Smk5UE0xVUZYS29STFRUTHpXQjNQUHNPam5xQWh4T1JFakQ2ZjFkM3JmR0FUK2dkTHc0RTV2amYzWlRXNEdpSkR1UkEyTFpuNVN1dW89In0%3D',
-        'C2': 'eyJpdiI6IkdlZzVRTEVlZUFJUU1BUTh0UHh2TUE9PSIsInZhbHVlIjoiNWhycFNFWXdlVUFWWjgzZHkvQ2xub3JxZ0grMTNLZUdqc3dhTHI4dzlKem9acTF6RkltR0VDdmhuaDIxVmRFeFZvRWZsM3NIdks1YlErTWEwV1k4aGkzcS9QMVJuM3NUaEJ0UVMyUlpQZVhCUTByNmN2ckl2S09ST3gxWTVNQXRjTk8zVHVZRFlOSHZvUE1kYUVubHpaVm1qTW1GdkNuNHRWQ0MyTWIwSGpXMkVFNEcxdEhjTUVYcnovcTNQVk00ZWVwTmhIaTMwZWhuNU5FYVVXdDJSZDFFSktLZFF5NzY2QlFneDdTNTQyNHJaaGt3MG9OR0NaOFhJV3FwUnptV0oweVZuaURlM3RRR0tpeGxra2Z2MkM5U0FRM0FDYXdNSE44WGt4Z3Y1T289In0%3D'
+        'C1': 'eyJpdiI6IlAwaGM5dEprT25nSnRHQmxjaEEzOFE9PSIsInZhbHVlIjoiM1JOeEtQMkRJdGZOWjJ4ZTBRTStwdnYvNDZRMXBNRWRhamxoZkYzdWJGUmtSWWp0OW5tK1dKendmRXIxNit2Y3A4cEI4a29IM2xDa1J1MC9JYmJDeHVrOXJYSWc5MURpOGl1NDMrazVXQ1pxbmt5SVBWa0xpRlBHYS9xbndNckpUZkg5WkhiSFJRU1ZNZUxLa3lid1lpM1k3S3NVUElza2tTLzVtZW9iUHVDNWRTWnJ0RmUxTGNleVppVEYyeXZCZHU5ZFFaNWcwRUoyN0lJem8vZVFRMzlxTy9xWWNTZ3Y3UUhhTUFTdUpwcGlFck9Dd0hweGxWdDE3WlJoT3NSVlZ3RUt5VFVuWmtsVzc1RG5USS93ZUJTNXZrQVdDcG9kT1lvNGxnLzY4ZzQ9In0%3D',
+        'C2': 'eyJpdiI6IkswaitHbUlkTytpZUhTZDRnYndxM2c9PSIsInZhbHVlIjoiOXFyZVU4WWU4amw0bnQxdS9JaVFrUWFWZnhXbUl6Ums3ek1PWHpVQnlydlBGN3p2VCsxOG9NNWx3WThrb0t3QkN6SWNaWXRBTWVKQjQxSzRPcXFLTDA1MUFGV284SDV2ZjZwR1M5T2dJRU9jMlVJRUdPb0dWQ2wyUnNSZnJ1UHJJT2ZMcWtDUlVSUVJMUWNCTVlPTnp4ODVTNlp5MEhNL0pDajN6N05HalNWQmgwTHpySDBHVVdYWlJsa3h6WDRKSGxLWjBFUFQxamhJUDJlY0RhQnRZbkZiV2dGcXhxYWRvSXdtZGRFQk1zZWxUUDRKajA1d0xObG8xaWtMaC9sTmtPQUJiWFVNbnd1b3RaQVhmQ0RBK0dWRmYzV1hqSFc3QU1RMjAva21lM1pONFdDak5kbWtNUGRxVjh2RVNhMHJpK0xJblRWWFN0NVcycHBkTkRyREdYaU9nb3lJUzM1ejdNWXcvaWlnd0NqSGlHemlrM3hTaXhIT0RyTi8wNHFmIn0%3D'
     }
 
     constructor(props) {
@@ -20,8 +20,9 @@ class GuacamoleStage extends React.Component {
         const client = new Guacamole.Client(tunnel);
 
         this.myRef.current.appendChild(client.getDisplay().getElement());
-        client.connect('token='+this.token);
 
+        // Microphone
+        
         // Mouse listener
         const mouse = new Guacamole.Mouse(client.getDisplay().getElement());
         mouse.onEach(['mousedown', 'mouseup', 'mousemove'], function sendMouseEvent(e) {
@@ -42,9 +43,11 @@ class GuacamoleStage extends React.Component {
             console.error(error);
         };
 
-    this.client = client;
-    this.mouse = mouse;
-    this.keyboard = keyboard;
+        client.connect('token='+this.token);    // Connect to Webserver
+        
+        this.client = client;
+        this.mouse = mouse;
+        this.keyboard = keyboard;
     }
 
     componentWillUnmount() {

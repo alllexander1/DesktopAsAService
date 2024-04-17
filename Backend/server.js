@@ -7,8 +7,8 @@ const app = express();
 const server = http.createServer(app);
 
 const guacdOptions = {
-    //host: '192.168.178.31',
-    host: 'localhost',
+    host: '192.168.178.31',
+    //host: 'localhost',
     port: 4822
 };
 
@@ -17,6 +17,17 @@ const clientOptions = {
         cypher: 'AES-256-CBC',
         key: 'MySuperSecretKeyForParamsToken12'
     }
+    // Logs
+    /*,log: {
+        level: 'DEBUG',
+        stdLog: (...args) => {
+            console.log('[MyLog]', ...args)
+        },
+        errorLog: (...args) => {
+            console.error('[MyLog]', ...args)
+        }
+    }*/
+    // End Logs
 };
 
 const callbacks = {
@@ -26,7 +37,6 @@ const callbacks = {
             return callback(new Error('Token expired'));
         }
         settings.connection['drive-path'] = '/tmp/guacamole_' + settings['userId'];
-
         callback(null, settings);
     }
 };

@@ -3,21 +3,41 @@ const crypto = require('crypto');
 const CIPHER = 'aes-256-cbc';
 const SECRET_KEY = 'MySuperSecretKeyForParamsToken12';
 
+//Windows RDP
 const tokenObject = {
     connection: {
         type: "rdp",
         settings: {
             "hostname": "192.168.178.30",
-            "username": "alex",
+            "username": "Alex",
             "password": "win10",
             "enable-drive": true,
             "create-drive-path": true,
             "security": "any",
             "ignore-cert": true,
-            "enable-wallpaper": false
+            "enable-wallpaper": false,
+            "enable-printing": true,
+            //"audio": ["audio/L8", "audio/L16"],
+            "enable-audio-input": true
         }
     }
 };
+
+// Linux vnc
+/*const tokenObject = {
+    connection: {
+        type: "vnc",
+        settings: {
+            "hostname": "192.168.178.28",
+            "username": "alex",
+            "password": "vnc",
+            "security": "any",
+            "ignore-cert": true,
+            "enable-audio": true,
+            "audio-servername": "192.168.178.28"
+        }
+    }
+};*/
 
 function encryptToken(value) {
     const iv = crypto.randomBytes(16);
@@ -35,21 +55,11 @@ function encryptToken(value) {
     return Buffer.from(json).toString('base64');
 }
 
+// Encrypt the tokens
+
+
 const originalToken = JSON.stringify(tokenObject, null, 2);
 const token = encryptToken(tokenObject);
 const urlencodedToken = encodeURIComponent(token);
 
-console.log("Parameters:");
-console.log(originalToken);
-
-console.log("\n");
-
-console.log("Encrypted token:");
-console.log(token);
-
-console.log("\n");
-
-console.log("Use this token in the URL:");
-console.log(`ws://localhost:8080/?token=${urlencodedToken}`);
-console.log('\n')
 console.log(`${urlencodedToken}`)

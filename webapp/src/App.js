@@ -1,11 +1,11 @@
 import './App.css';
-import GuacamoleStage from './GuacamoleClient2';
+import GuacamoleStage from './GuacamoleClient';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import React, { useState } from 'react';
 
 function App() {
 
-  const [selectedOption, setSelectedOption] = useState('C1');
+  const [selectedOption, setSelectedOption] = useState('C2');
 
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);
@@ -18,10 +18,10 @@ function App() {
         <div className="d-flex justify-content-center align-items-baseline" >
           <span className="me-4">Please select a connection:</span>
           <select className="form-select w-auto mb-4" value={selectedOption} onChange={handleSelectChange}>     
-            <option value="C1">Linux Mint - RDP</option>
+            <option value="C1">Linux Mint - VNC</option>
             <option value="C2">Windows 10 - RDP</option>
           </select>
-        </div>      
+        </div>    
         <div className="d-flex justify-content-center">
           <GuacamoleStage connection={selectedOption} key={selectedOption}></GuacamoleStage>
         </div>
@@ -29,6 +29,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;
