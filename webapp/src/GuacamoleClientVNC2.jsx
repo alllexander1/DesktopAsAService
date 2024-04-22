@@ -8,7 +8,7 @@ class GuacamoleStage extends React.Component {
     // Connection tokens, ToDo: implement better solution
     conn = {
         'C1': 'eyJpdiI6IlhKM1ZUb01BQW1rRW5kQlRxSjM0WWc9PSIsInZhbHVlIjoiaitNKzFJMUlmd3dqRk9NZTl0WG9LUGNSRWxvc0M4bjRtOUJlc2ZXejNmWVhmSk91VVh6QnpRNHRRZmE5SUMzRVc0bk9uNm1KeVIza21pTVFJSGdENWVDZTRwMjc4a2NxaXpkVml6VTBRcXZ2ei9scndBUGJYd1Y4SjMzS2ltejRCYWRQOHYxU2Q2QXpvMTZyY0JvNDVXQS9VYTg1ZjhoNGRYM3MvR2JlSEZwTDR0dlpTOUJoYzJ4N3Y3YzBsVExMSmFUK3JnR1dnUEx2bmt5RTBVQ1ZmM2Z3SHoxMjlYaUFaV1Y2RE9CS2hETzkzVzEvbnNZekhZZEVheEZhaWpDekNoUlYxL2o1U1JuZzNQWFZXTWVOS3c9PSJ9',
-        //'C1': 'eyJpdiI6IkZ2REVWLzZOelBicWt4RWh4aDVPY1E9PSIsInZhbHVlIjoiaWVCQ21FQnlSSHh0Z1pmamJZc2YvV3JQcEFneFFTa2VBOXVPQmZ5eGNMSk0yZGx1aGxtenp5a0x1ZmUvN3BDWXA1ZkJRSU9tLytRd3lTRWFvZFpGWHVmeWNXYnUxOEhSVkdVMHRQQlpQenYrYjRTeGhxVFhpQkwzdkJOVzhtSUNEUFVPQXhWK2tvL1lNMlRMd0wxTVcxVDJGbmlwRDR6NnV5WEU5MkxaT3dWck1wK2xsTlhMdzNqNjVMWjBBeGl4RDMydFhBWDViWEdpdzAzREJ2VzVDWXR2SXZLbENyZ0g4QWs1S1h2Z2d3RWNZQ0lqNkxaQk5sM0tLeFpWZGJwczBOczl2MHJRZjg5SFdZbEgvZHkrL3hrKzlVOEhJM2JFR3czU2FmYnV0bXlWL21mNHpJcWRGOUxvaE40dWZnaXVsRXlVcXRSRkVWR3pITmJZN3ZPQmZ6dW9WdVZJQkU4NFUzRVJVNU5DRHg0PSJ9',
+        //'C1': 'eyJpdiI6IjhXNEhuSEx4NFdQUFlsWlVITmdOVUE9PSIsInZhbHVlIjoicnVLcXhxSk5OTXlGaTJvQloyd3NaWXI1OXUrNEVqNkkrd09LZERUSzBXWkFSeUJEWDFXMzN0S2NtdjRkYVFaNURtdHVUaVFRc2RObGpSUHBtZkxaUXNndlIwTzJvY05zOVpkNWsvbm9OQjAvanFJaXh0ZnAwTGRncjh6VVJNc1pPeE1NZnprUldkaHdFb3ZKWmlYK0JXeHFqbGFOVDc1VlRQOW5mc3lvYXR2QWd1enFKcFJZK2VkakIvVE9ydHZOZUQzRGlXRWd2ZnkyMXYzRXYvazA2T0l5bzJRRkwwVE9vNm0xd2g1UFViZnhxNmtqSzRVT0ZIOURKY0VsdGxKT1E4azN3TjQvWG1RemdWaGJOMWZBM21lT1hVaDNza2RmZXVjNHlQZ3ZnL0k9In0%3D',
         'C2': 'eyJpdiI6ImlDcFVhODNOR0ZkMEZkTG44SGVzRmc9PSIsInZhbHVlIjoib20xQ0NacFdtZTFDd0VIRGR1Q1hqb0dzRFR3WEVlQ3FmcUpMTmk0Ri9aWGJKbXdjaGR3WTIxVEs3NWljb1RaRy82UWJUSlM1UDZDWkNMU1k0UTNlc3VrbzJtK3VWZW9aVXdYWjlhM2VkdXRVaG9TTUVpSHdRdFF4dHIvU25sMkdJVll0VlF4U0p1WDdPd21DdTZBWUtiMGQ1STNxU2FGL0N1VTNiRmxKRjNTc0o3eEs2YkpzQnhsRDhzbGtrY25rTFVuMWFVc0NwY1E2R0phR1c0ZExkcjZGeHA2U3dkTGlNZlNkU3RxNzdpd3MvN0NVUVJZS0x4aDhuOWZqT0dKUExHTSt0MUlya1owVEp3QjBKdnNDdzdyYTAzRldvN3lmVVBKVERjQXBHNElnMERSK01ieGt2TjV5ZmxvN2ljOStwTFV3aHljazBzK3NBVWpNOEw2cWU0S0lCdm1rZVVpZGNnYm5EdTVTSktFPSJ9'
     }
 
@@ -31,9 +31,36 @@ class GuacamoleStage extends React.Component {
 
         //Microphone
         const handleAudio = function() {
-            const stream = client.createAudioStream("audio/L16;rate=44100,channels=2")
-            const reader = Guacamole.AudioRecorder.getInstance(stream, "audio/L16;rate=44100,channels=2")
-            console.log('Microphone enabled')
+            var audioStream = client.createAudioStream("audio/L16;rate=44100,channels=2") ;
+            var writer = new Guacamole.ArrayBufferWriter(audioStream);
+
+            navigator.mediaDevices.getUserMedia({ audio : true }).then((stream) => {
+                var context = Guacamole.AudioContextFactory.getAudioContext() ;
+                var processor = context.createScriptProcessor(2048, 2, 2) ;
+                    processor.connect(context.destination) ;
+                
+                    // Send blobs when audio buffers are received
+                    processor.addEventListener('audioprocess', function processAudio(event) {
+                        var inputBuffer = event.inputBuffer;
+                        var inputData = inputBuffer.getChannelData(0);
+                        // Write the audio data to the Guacamole audio input stream
+                        var bytes = new Int16Array(inputData.length);
+                        //console.log(bytes, 'bytes')
+                        for (var i = 0; i < inputData.length; i++) {
+                            bytes[i] = inputData[i] * 32766;
+                        };
+                        writer.sendData(bytes.buffer);
+                    });
+            
+                    // Connect the processing node to the user's audio input source
+                    var source = context.createMediaStreamSource(stream) ;
+                    source.connect(processor) ;
+            
+                    // Attempt to explicitly resume AudioContext, as it can be paused
+                    // by default
+                    if (context.state === 'suspended')
+                        context.resume();
+            });
         }
 
         client.onstatechange = function(state){

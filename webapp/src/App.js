@@ -5,9 +5,9 @@ import React, { useState } from 'react';
 
 function App() {
 
-  const [selectedOption, setSelectedOption] = useState('C2');
+  const [selectedOption, setSelectedOption] = useState('C1');
 
-  const handleSelectChange = (event) => {
+  const handleSelectChange = (event) => { 
     setSelectedOption(event.target.value);
   };
 
