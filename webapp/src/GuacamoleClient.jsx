@@ -1,6 +1,4 @@
-//import Guacamole from 'guacamole-common-js';
-import Guacamole from 'C:\\Users\\alexa\\Desktop\\Masterarbeit\\DesktopAsAService\\webapp\\node_modules\\guacamole-common-js\\dist\\cjs\\guacamole-common.js';
-
+import Guacamole from 'guacamole-common-js';
 import React from 'react';
 
 class GuacamoleStage extends React.Component {
