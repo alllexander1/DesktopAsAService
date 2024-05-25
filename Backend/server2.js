@@ -17,17 +17,6 @@ const clientOptions = {
         cypher: 'AES-256-CBC',
         key: 'MySuperSecretKeyForParamsToken12'
     }
-    // Logs
-    /*,log: {
-        stdLog: (...args) => {
-         level: 'DEBUG',
-           console.log('[MyLog]', ...args)
-        },
-        errorLog: (...args) => {
-            console.error('[MyLog]', ...args)
-        }
-    }*/
-    // End Logs
 };
 
 const callbacks = {

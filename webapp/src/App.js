@@ -1,7 +1,7 @@
 import './App.css';
 import FileManager from './FileManager';
 import Sidebar from './Sidebar';
-import GuacamoleStage from './GuacamoleClient';
+import GuacamoleStage from './GuacamoleClientVNC2';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import React, { useState } from 'react';
 
