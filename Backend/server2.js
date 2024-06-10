@@ -8,7 +8,6 @@ const server = http.createServer(app);
 
 const guacdOptions = {
     host: '192.168.178.31',
-    //host: 'localhost',
     port: 4822
 };
 
