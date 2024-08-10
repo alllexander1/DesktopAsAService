@@ -4,27 +4,28 @@ const CIPHER = 'aes-256-cbc';
 const SECRET_KEY = 'MySuperSecretKeyForParamsToken12';
 
 //Windows RDP
-/*const tokenObject = {
+const tokenObject = {
     connection: {
         type: "rdp",
         settings: {
-            "hostname": "192.168.178.28",
+            "hostname": "192.168.178.30",
             "username": "alex",
-            "password": "mint",
+            "password": "win10",
             "enable-drive": true,
             "create-drive-path": true,
+            "drive-path": '/home/alex/PDF',
             "security": "any",
             "ignore-cert": true,
             "enable-wallpaper": false,
             "enable-printing": true,
-            //"audio": ["audio/L8", "audio/L16"],
+            "audio": ["audio/L8", "audio/L16"],
             "enable-audio-input": true
         }
     }
-};*/
+};
 
 // Linux vnc
-const tokenObject = {
+/*const tokenObject = {
     connection: {
         type: "vnc",
         settings: {
@@ -38,7 +39,7 @@ const tokenObject = {
             "audio-servername": "192.168.178.28"
         }
     }
-};
+};*/
 
 function encryptToken(value) {
     const iv = crypto.randomBytes(16);

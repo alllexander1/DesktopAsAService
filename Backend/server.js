@@ -19,15 +19,15 @@ const clientOptions = {
     }
     // Logs
     /*,log: {
+        level: 'Debug',
         stdLog: (...args) => {
-         level: 'DEBUG',
-           console.log('[MyLog]', ...args)
+            console.log('[MyLog]', ...args)
         },
         errorLog: (...args) => {
             console.error('[MyLog]', ...args)
         }
-    }*/
-    // End Logs
+    }
+    // End Logs*/
 };
 
 const callbacks = {
@@ -36,6 +36,7 @@ const callbacks = {
             console.error('Token expired');
             return callback(new Error('Token expired'));
         }
+        //console.log("testalex"+JSON.stringify(settings, null, 2));
         settings.connection['drive-path'] = '/tmp/guacamole_' + settings['userId'];
         callback(null, settings);
     }

@@ -17,7 +17,7 @@ class GuacamoleStage extends React.Component {
     }
 
     componentDidMount(){
-        const tunnel = new Guacamole.WebSocketTunnel('ws://localhost:8080/');
+        const tunnel = new Guacamole.WebSocketTunnel('ws://localhost:8080/ws-guacamole/');
         const client = new Guacamole.Client(tunnel);
 
         this.myRef.current.appendChild(client.getDisplay().getElement());
@@ -29,7 +29,7 @@ class GuacamoleStage extends React.Component {
 
         //Microphone
         
-        const socket = new WebSocket('ws://localhost:9000');//('ws://192.168.178.28:8080');
+        const socket = new WebSocket('ws://localhost:8020');
         socket.addEventListener('open', event => {console.log('open')});
         socket.addEventListener('message', event => {console.log('message')});
         socket.addEventListener('close', event => {console.log('close')});

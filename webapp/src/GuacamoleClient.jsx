@@ -17,14 +17,26 @@ class GuacamoleStage extends React.Component {
     }
 
     componentDidMount(){
-        const tunnel = new Guacamole.WebSocketTunnel('ws://localhost:8080/');
+        const tunnel = new Guacamole.WebSocketTunnel('ws://localhost:8080/guac');
         const client = new Guacamole.Client(tunnel);
 
         this.myRef.current.appendChild(client.getDisplay().getElement());
 
-        // Download PDF
-        client.onfile = (stream, mimetype, name) => {
-            console.log('file stream received')
+        // Connect to printing service
+        console.log('Connecting to print server')
+        const printSocket = new WebSocket('ws://localhost:8010/')
+
+        printSocket.onopen = function(){
+            console.log('Connected to printServer')
+        }
+        printSocket.onmessage = (m) => {
+            const data = JSON.parse(m.data);
+            if (data.id) {
+                console.log('Your printer has id :' + data.id);
+            } else if (data.path) {
+                console.log('Received file path:', data.path);
+                this.downloadFile(data.path);
+            }
         }
 
         //Microphone
@@ -36,6 +48,7 @@ class GuacamoleStage extends React.Component {
 
         client.onstatechange = function(state){
             if (state === 3) {
+                console.log('Connected to guacamole server')
                 handleAudio();
             }
         }
@@ -67,11 +80,30 @@ class GuacamoleStage extends React.Component {
         this.keyboard = keyboard;
     }
 
+    downloadFile = function(path) {
+        fetch(path)
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = path.split('/').pop();
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error('Error downloading file:', error));
+
+    }
+
+    test(){
+        console.log('test')
+    }
+
     componentWillUnmount() {
         this.client.disconnect();
     }
-
-    
 
     render() {
         return <div ref={this.myRef} />;
