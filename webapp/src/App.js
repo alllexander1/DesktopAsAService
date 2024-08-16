@@ -1,8 +1,10 @@
 import './App.css';
+import RDPViewer from './viewers/RDPViewer.jsx';
+import VNCViewer from './viewers/VNCViewer.jsx';
+import BaseStage from './BaseStage.jsx';
 import GuacamoleStage from './GuacamoleStage.jsx';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
-import Sidebar from './Sidebar.js'
 
 function App() {
 
@@ -15,9 +17,6 @@ function App() {
     },
     C2: {
       type: 'RDP', 
-      // Working token:
-      //token: 'eyJpdiI6ImlDcFVhODNOR0ZkMEZkTG44SGVzRmc9PSIsInZhbHVlIjoib20xQ0NacFdtZTFDd0VIRGR1Q1hqb0dzRFR3WEVlQ3FmcUpMTmk0Ri9aWGJKbXdjaGR3WTIxVEs3NWljb1RaRy82UWJUSlM1UDZDWkNMU1k0UTNlc3VrbzJtK3VWZW9aVXdYWjlhM2VkdXRVaG9TTUVpSHdRdFF4dHIvU25sMkdJVll0VlF4U0p1WDdPd21DdTZBWUtiMGQ1STNxU2FGL0N1VTNiRmxKRjNTc0o3eEs2YkpzQnhsRDhzbGtrY25rTFVuMWFVc0NwY1E2R0phR1c0ZExkcjZGeHA2U3dkTGlNZlNkU3RxNzdpd3MvN0NVUVJZS0x4aDhuOWZqT0dKUExHTSt0MUlya1owVEp3QjBKdnNDdzdyYTAzRldvN3lmVVBKVERjQXBHNElnMERSK01ieGt2TjV5ZmxvN2ljOStwTFV3aHljazBzK3NBVWpNOEw2cWU0S0lCdm1rZVVpZGNnYm5EdTVTSktFPSJ9', 
-      // Testing token
       token: 'eyJpdiI6InY1YVhSSjlhOTVSZDl3Ti9jVDg5QXc9PSIsInZhbHVlIjoidkR4VitybXBiRUVqNVRvM1MySzJnU01YL3ovQ3o4NG1QaHRmUTJDVlNjeStyZlI5WitzdUJPQ0VTUjRjaUJVVnU4clN1WDlHK1dsazBiT0FpT0t5TUEzQnV2bXNDOWFFdnkyTW1Qb2t1LzlqeXRySVRzeWlxMFlzejFIQ3BSZmxzU1hPSkNOc3d5T2tHQ1FQVm94N1NIb3ZIZ0VkK0UxSHpqVWVNS1Z1WHhaMGhUN0VXZ2pSVUh3Y1JSVzQ1d2ZLL0VBSE1lNkdBTThJRU9CVVFtVEpMK1IzNEQwUWkyZ1ZkMmtpbDZIeUtvVEo0QjBkMW9FUDJVMk9tbXRRUXhnMzd4K2F3MnYvVVhGVEZUMndnZkp5cW8xYnhiRTRaNGVuRTRjN2krRGJsRzRjYW93TWhZSjkzWnBYbXBMMHlYYzIrTEp1bVo2eEtmc0VuVUhZdmZuOEFYNXlmL0VHbTg0Z0N0VUZNWWZtVmMxR2lKbExKU0lxMlp3SGlOWk9TWkhzMU9Vcm0rV1Q3c25BYUFaTnhsVUxYTWs2d20rdkZYcFduWTN3cytrbHNrS3o5U21FUEVaQmVTTSttcGVDWldNNiJ9',
       address: '192.168.178.30',
       os: 'Windows 10 Pro'
@@ -43,7 +42,7 @@ function App() {
           </select>
         </div> 
         <div className="d-flex justify-content-center">
-          <GuacamoleStage connection={connections[selectedOption]} key={selectedOption}></GuacamoleStage>
+          <BaseStage connection={connections[selectedOption]} key={selectedOption}></BaseStage>
         </div>
       </div>  
     </div>

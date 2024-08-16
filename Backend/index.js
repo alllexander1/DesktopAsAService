@@ -1,7 +1,7 @@
 const GuacamoleLite = require('guacamole-lite');
 const express = require('express');
 const http = require('http');
-const PrintServer = require('./servers/PrintServer');
+const PrintServer = require('./servers/PrintServer2');
 const cors = require('cors');
 const AudioServer = require('./servers/AudioServer');
 
@@ -34,7 +34,7 @@ guacHttpServer.listen(8000);
 
 
 // Print Server
-/*app.use(express.json())
+app.use(express.json())
 app.use('/files', express.static('C:\\Users\\alexa\\Desktop\\Masterarbeit\\out'))
 const printHttpServer = http.createServer(app);
 const printServer = new PrintServer(printHttpServer, app)
@@ -45,7 +45,7 @@ printHttpServer.listen(8010, () => {
 
 async function setup(printServer){
     await printServer.init();
-}*/
+}
 
 // Sound Server
 const audioHttpServer = http.createServer(app);

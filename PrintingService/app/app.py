@@ -77,6 +77,6 @@ def check_for_printer():
         return jsonify(exists=False, message=f"Printer with ID {id} does not exist"), 200
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+#if __name__ == '__main__':
+#    app.run(host='0.0.0.0', port=5000)
 

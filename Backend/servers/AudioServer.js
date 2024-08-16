@@ -5,7 +5,7 @@ const AudioClient = require('../clients/AudioClient')
 class AudioServer{
 
     static id = 1;
-
+ 
     constructor(server){
         this.wss = new WebSocket.Server({server})
         this.wss.on('connection', this.onConnection.bind(this));
