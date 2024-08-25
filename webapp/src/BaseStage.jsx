@@ -6,6 +6,8 @@ import Table from 'react-bootstrap/Table'
 import {Mic, MicMute, ChevronUp, ChevronDown} from 'react-bootstrap-icons'
 import RDPClient from './clients/RDPClient'
 import VNCExtention from './clients/VNCExtention'
+import PrintClient from './clients/PrintClient'
+import AudioClient from './clients/AudioClient'
 
 class BaseStage extends React.Component {
 
@@ -17,11 +19,26 @@ class BaseStage extends React.Component {
         this.state = {
             isLoading: true,
             error: false,
-            taskbarCollapsed: false
+            taskbarCollapsed: false,
+            printerStatus: 'not connected',
+            printerName: '',
+            audioStatus: 'not connected'
         }
         this.audioStreamRDP = null;
         this.recorder = null;
     }
+
+    updatePrinterStatus = (status) => {
+        this.setState({ printerStatus: status });
+    };
+
+    updatePrinterName = (name) => {
+        this.setState({printerName: name});
+    };
+
+    updateAudioStatus = (status) => {
+        this.setState({ audioStatus: status });
+    };
 
     componentDidMount(){
         const tunnel = new Guacamole.WebSocketTunnel('ws://localhost:8080/');
@@ -53,15 +70,32 @@ class BaseStage extends React.Component {
         }
 
         // On connect
-        this.extention = null;
         client.onstatechange = (state) => {
             if(state === 3){
-                this.setState({isLoading: false, error: false})
-                if(this.props.type == 'RDP')
-                    this.extention = new RDPClient(client);
-                else
-                    this.extention = new VNCExtention('ws://localhost:8020/', 'ws://localhost:8010/', this.props.address, 'alex123')
-                    this.extention.startPrintClient();
+                if(this.props.type == 'RDP'){
+                    this.rdpManager = new RDPClient(client);
+                }
+                else{
+                    this.setState({isLoading: false, error: false})
+
+                    this.vncPrinter = new PrintClient('192.168.178.29', 8010, 'tom_printer')
+                    this.vncPrinter.connect();
+            
+                    this.vncPrinter.onStatusChange = (state) => {
+                        this.updatePrinterStatus(state)
+                    }
+
+                    this.vncPrinter.onPathReceived = (path) => {
+                        this.updatePrinterName(path)
+                    }
+                    
+            
+                    this.audioClient = new AudioClient('192.168.178.28', 'ws://localhost:8020/');
+                    this.audioClient.connect();
+                    this.audioClient.onStatusChange = (state) => {
+                        this.updateAudioStatus(state)
+                    }
+                }
             }
         }
 
@@ -73,6 +107,21 @@ class BaseStage extends React.Component {
 
     componentWillUnmount(){
         this.client.disconnect();
+        if(this.audioClient)
+            this.audioClient.disconnect();
+        if(this.vncPrinter)
+            this.vncPrinter.disconnect();
+    }
+
+    toggleAudio = (event) => {
+        this.setState((prevState) => {
+            const newState = !prevState.audioEnabled;
+            if(newState)
+                this.audioClient.startRecording();
+            else
+                this.audioClient.stopRecording();
+            return {audioEnabled: newState}
+        });
     }
 
     toggleTaskbar = () => {
@@ -122,7 +171,7 @@ class BaseStage extends React.Component {
                                 {this.state.audioEnabled ? <Mic /> : <MicMute />}
                             </button>
                             <br/>
-                            <span>Status:{this.state.audioStatus}</span>
+                            <span>Status: {this.state.audioStatus}</span>
                         </div>
                         <div>
                             <span className='heading'>Printer:</span>

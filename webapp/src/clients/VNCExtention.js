@@ -1,4 +1,4 @@
-import PrintClient from "./PrintClient2";
+import PrintClient from "./PrintClient";
 
 class VNCExtention {
 

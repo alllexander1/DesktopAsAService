@@ -5,7 +5,7 @@ import Guacamole from 'guacamole-common-js'
 import React from 'react';
 import {Mic, MicMute, ChevronUp, ChevronDown} from 'react-bootstrap-icons'
 import PrintClient from '../clients/PrintClient'
-import AudioClient from '../clients/AudioClient_Opimized'
+import AudioClient from '../clients/AudioClient'
 import AudioRecorder from '../AudioRecorder';
 
 class VNCViewer extends React.Component {
