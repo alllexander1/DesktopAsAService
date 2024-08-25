@@ -71,6 +71,8 @@ Die Klasse hat folgende Methoden:
 - stopRecording
 - Callback: onStatusChange (state)
 
+Um Audio aufzunehmen soll am besten einen Button hinzugefügt werden der die Aufnahme steuert. Die aufnahme kann nur dann erfolgen wenn die Verbindung zum Proxy und Remote-Desktop steht (status='ready').
+
 Die Klasse ``PrintClient`` verbindet sich mit dem Printer WS-Server. Die benötigten Parametern sind Server IP Adresse und Port sowie die Client-ID (zb. Benutzername oder Benutzer ID). 
 Die Klasse hat folgenden Methoden:
 - connect
