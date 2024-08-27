@@ -5,7 +5,6 @@ import Card from 'react-bootstrap/Card'
 import Table from 'react-bootstrap/Table'
 import {Mic, MicMute, ChevronUp, ChevronDown} from 'react-bootstrap-icons'
 import RDPClient from './clients/RDPClient'
-import VNCExtention from './clients/VNCExtention'
 import PrintClient from './clients/PrintClient'
 import AudioClient from './clients/AudioClient'
 
@@ -20,9 +19,9 @@ class BaseStage extends React.Component {
             isLoading: true,
             error: false,
             taskbarCollapsed: false,
-            printerStatus: 'not connected',
+            printerStatus: '',
             printerName: '',
-            audioStatus: 'not connected'
+            audioStatus: ''
         }
         this.audioStreamRDP = null;
         this.recorder = null;
@@ -72,12 +71,14 @@ class BaseStage extends React.Component {
         // On connect
         client.onstatechange = (state) => {
             if(state === 3){
-                if(this.props.type == 'RDP'){
+                this.setState({isLoading: false, error: false})
+                if(this.props.connection.type === 'RDP'){
                     this.rdpManager = new RDPClient(client);
+                    this.updateAudioStatus('Audio is managed by RDP')
+                    this.updatePrinterStatus('Using RDP printing')
+                    this.updatePrinterName('Guacamole Printer')
                 }
                 else{
-                    this.setState({isLoading: false, error: false})
-
                     this.vncPrinter = new PrintClient('192.168.178.29', 8010, 'tom_printer')
                     this.vncPrinter.connect();
             
@@ -167,7 +168,7 @@ class BaseStage extends React.Component {
                         </div>
                         <div>
                             <span className='heading'>Audio:</span>
-                            <button style={{marginBottom: '10px'}} className={this.state.audioEnabled ? 'btn btn-success' : 'btn btn-danger'} onClick={this.toggleAudio}>
+                            <button disabled={this.props.connection.type==='RDP' || this.state.audioStatus != 'ready'} style={{marginBottom: '10px'}} className={this.state.audioEnabled ? 'btn btn-success' : 'btn btn-danger'} onClick={this.toggleAudio}>
                                 {this.state.audioEnabled ? <Mic /> : <MicMute />}
                             </button>
                             <br/>

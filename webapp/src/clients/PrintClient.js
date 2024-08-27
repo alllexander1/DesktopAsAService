@@ -6,7 +6,7 @@ class PrintClient{
         this.serverPort = serverPort;
         this.id = id;
         this._path = ''
-        this._status = 'unconnected';
+        this._status = 'not connected';
         this.onStatusChange = null;
         this.onPathReceived = null;
         this.onFile = this.downloadFile;

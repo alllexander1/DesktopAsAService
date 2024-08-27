@@ -37,7 +37,7 @@ const callbacks = {
             return callback(new Error('Token expired'));
         }
         //console.log("testalex"+JSON.stringify(settings, null, 2));
-        settings.connection['drive-path'] = '/tmp/guacamole_' + settings['userId'];
+        //settings.connection['drive-path'] = '/tmp/guacamole_' + settings['userId'];
         callback(null, settings);
     }
 };

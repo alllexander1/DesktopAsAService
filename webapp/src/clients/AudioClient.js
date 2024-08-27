@@ -4,7 +4,7 @@ class AudioClient {
         this.vmAddress = vmAddress;
         this.wsServerAddress = wsServerAddress;
 
-        this._status = 'unconnected';
+        this._status = 'not connected';
         this.onStatusChange = null;
 
         this.audioContext = null;
@@ -30,7 +30,7 @@ class AudioClient {
 
         this.socket.onopen = () => {
             // Send the address of the VM to the audio server
-            this.socket.send('192.168.178.28');
+            this.socket.send(this.vmAddress);
         }
 
         this.socket.onerror = (e) => {
