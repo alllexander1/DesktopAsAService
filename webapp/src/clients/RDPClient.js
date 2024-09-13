@@ -1,5 +1,4 @@
-//import Guacamole from 'guacamole-common-js'
-import Guacamole from '../MyGuacamole'
+import Guacamole from 'guacamole-common-js'
 
 class RDPClient{
 

@@ -5,8 +5,9 @@ import Card from 'react-bootstrap/Card'
 import Table from 'react-bootstrap/Table'
 import {Mic, MicMute, ChevronUp, ChevronDown} from 'react-bootstrap-icons'
 import RDPClient from './clients/RDPClient'
-import PrintClient from './clients/PrintClient'
-import AudioClient from './clients/AudioClient'
+import PrintClient from './clients/PrintClient2'
+import AudioClient from './clients/AudioClient2'
+import config from './config'
 
 class BaseStage extends React.Component {
 
@@ -68,6 +69,23 @@ class BaseStage extends React.Component {
             this.setState({isLoading: false, error: true})
         }
 
+        // to delete 
+        this.audioClient = new AudioClient(config, '123', '192.168.178.28')
+        this.audioClient.connect();
+        this.audioClient.onStatusChange = (state) => {
+            this.updateAudioStatus(state)
+        }
+
+        this.printClient = new PrintClient(config, '123', 'tom_printer')
+        this.printClient.connect();
+        this.printClient.onPathReceived = (path) => {
+            this.updatePrinterName(path)
+        }
+        this.printClient.onStatusChange = (state) => {
+            this.updatePrinterStatus(state)
+        }
+        // until here
+
         // On connect
         client.onstatechange = (state) => {
             if(state === 3){
@@ -79,6 +97,7 @@ class BaseStage extends React.Component {
                     this.updatePrinterName('Guacamole Printer')
                 }
                 else{
+                    /*
                     this.vncPrinter = new PrintClient('192.168.178.29', 8010, 'tom_printer')
                     this.vncPrinter.connect();
             
@@ -96,6 +115,7 @@ class BaseStage extends React.Component {
                     this.audioClient.onStatusChange = (state) => {
                         this.updateAudioStatus(state)
                     }
+                    */
                 }
             }
         }

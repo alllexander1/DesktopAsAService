@@ -29,7 +29,6 @@ COPY /scripts/cupsd.conf /etc/cups/cupsd.conf
 RUN chmod -R 777 ./scripts/postprocess.sh
 
 EXPOSE 8010
-EXPOSE 8020
 EXPOSE 631
 
-CMD service dbus start && service cups start && node index.js
+CMD service dbus start && service cups start && node server.js

@@ -1,8 +1,5 @@
 import './App.css';
-import RDPViewer from './viewers/RDPViewer.jsx';
-import VNCViewer from './viewers/VNCViewer.jsx';
 import BaseStage from './BaseStage.jsx';
-import GuacamoleStage from './GuacamoleStage.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 
@@ -24,7 +21,7 @@ function App() {
     }
 };
 
-  const [selectedOption, setSelectedOption] = useState('C2');
+  const [selectedOption, setSelectedOption] = useState('C1');
 
   const handleSelectChange = (event) => { 
     setSelectedOption(event.target.value);

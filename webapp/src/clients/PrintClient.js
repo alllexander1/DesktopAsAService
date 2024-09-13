@@ -1,6 +1,5 @@
 class PrintClient{
 
-    static basePath = 'http://localhost:8010/'
     constructor(serverIP, serverPort, id){
         this.serverIP = serverIP;
         this.serverPort = serverPort;
