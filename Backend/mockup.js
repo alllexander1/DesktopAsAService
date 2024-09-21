@@ -30,6 +30,10 @@ app.ws('/vnc/printer', (ws, req) => {
         ws.send(m.data) // Forward to web-client
     }
 
+    proxy.onerror = (e) => {
+        console.log("Error")
+    }
+
     ws.on('close', () => {
         print_clients.delete(userID)
         proxy.close();
@@ -59,7 +63,7 @@ app.ws('/vnc/audio', (ws, req) => {
     })
 
     ws.on('message', data => {
-        audioClient.write(data)
+        audioClient.write(data) 
     })
 
     ws.on('close', () => {
