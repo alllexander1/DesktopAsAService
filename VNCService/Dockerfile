@@ -22,7 +22,7 @@ RUN npm install
 COPY . .
 
 # Fix line endings if working on windows host
-RUN dos2unix ./scripts/create_printer.sh ./scripts/delete_printer.sh ./scripts/postprocess.sh
+RUN dos2unix ./scripts/create_printer.sh ./scripts/delete_printer.sh ./scripts/postprocess.sh ./scripts/cupsd.conf
 
 COPY /scripts/cupsd.conf /etc/cups/cupsd.conf
 
@@ -31,4 +31,5 @@ RUN chmod -R 777 ./scripts/postprocess.sh
 EXPOSE 8010
 EXPOSE 631
 
+# Start command
 CMD service dbus start && service cups start && node server.js

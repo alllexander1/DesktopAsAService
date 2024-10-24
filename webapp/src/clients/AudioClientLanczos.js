@@ -1,8 +1,9 @@
 class AudioClient {
 
-    constructor(vmAddress, wsServerAddress){
-        this.vmAddress = vmAddress;
-        this.wsServerAddress = wsServerAddress;
+    constructor(config, token, destination){
+        this.token = token;
+        this.destination = destination;
+        this.wsServerAddress = config.microphoneAPI;
 
         this._status = 'not connected';
         this.onStatusChange = null;
@@ -26,25 +27,22 @@ class AudioClient {
 
     connect(){
         this.status = 'connecting'
-        this.socket = new WebSocket(this.wsServerAddress);
+        this.socket = new WebSocket(`${this.wsServerAddress}?token=${this.token}&destination=${this.destination}`);
 
         this.socket.onopen = () => {
-            // Send the address of the VM to the audio server
-            this.socket.send(this.vmAddress);
+            this.status = 'connected to proxy'
         }
 
         this.socket.onerror = (e) => {
-            this.status = 'error with ws'
+            this.status = 'error'
         }
 
         this.socket.onclose = () => {
             this.status = 'connection closed'
         }
 
-        // Only invoked once when server is connected to the VM or failed to connect
         this.socket.onmessage = (message) => {
-            console.log('Audio client received: ' + message.data)
-            if(message.data === 'Connected')
+            if(message.data === 'connected')
                 this.status = 'ready'
             else
                 this.status = 'cannot reach remote audio server'
@@ -65,7 +63,7 @@ class AudioClient {
             this.audioContext = new AudioContext();
             this.audioContext.resume();
 
-            const targetSampleRate = 44100; // Target sample rate for resampling
+            const targetSampleRate = 44100;
             const LANCZOS_WINDOW_SIZE = 3;
 
             function sinc(x) {
@@ -114,7 +112,6 @@ class AudioClient {
                 }
                 // Send audio data over WebSocket connection
                 this.socket.send(intData.buffer);
-                console.log("Size: "+ intData.buffer.byteLength);
             }
 
             const scriptNode = this.audioContext.createScriptProcessor(2048, 1, 1);

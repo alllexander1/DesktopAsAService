@@ -1,8 +1,6 @@
 const express = require('express')
 const enableWs = require('express-ws')
 const {exec} = require('child_process');
-const fs = require('fs');
-const { type } = require('os');
 
 const app = express()
 enableWs(app)
@@ -23,6 +21,7 @@ app.ws('/vnc/printer', async (ws, req) => {
         ws.send(JSON.stringify({status: error}))
     }
     ws.on('close', () => {
+        console.log(`Session for client id=${userID} closed`)
         sessions.delete(userID)
     })
 })
@@ -34,42 +33,6 @@ app.post('/api/vnc/file', (req, res) => {
     handlePath(data['message'])
     res.json({ status: 'Path processed'});
 });
-
-
-// Help functions
-
-function handlePath(path){
-    const clientId = path.split('/')[5];    // Extract the client id from the path
-    const ws = sessions.get(clientId);
-    const relativePath = `files/${clientId}/${path.split('/')[2]}`  // Extract the relative part of the file path
-
-    if(ws)
-       sendFile(path, ws);
-    else
-        console.log(`No active session for client ${clientId}`);
-}
-
-function sendFile(path, ws){
-    console.log('Sending file: ' + path)
-    const stream = fs.createReadStream(path);
-    const name = path.split('/').pop();
-    const mimetype = 'application/pdf';
-
-    ws.send(JSON.stringify({type: 'file-begin', name, mimetype}));
-
-    stream.on("data", (data) => {
-        const data64 = data.toString('base64')
-        ws.send(JSON.stringify({type: 'file-chunk', data: data64}));
-    })
-
-    stream.on("end", () => {
-        ws.send(JSON.stringify({type: 'file-end'}));
-        fs.unlink(path, (err) => {
-            if (err) throw err;
-                console.log(`File ${path} was deleted`);
-        });
-    })
-}
 
 async function createPrinter(name){
     console.log('Creating printer: ' + name);
@@ -86,6 +49,18 @@ async function createPrinter(name){
             }
         });
     });
+}
+
+function handlePath(path){
+    const clientId = path.split('/')[5];    // Extract the client id from the path
+    const fileName = path.split('/')[6];
+    const ws = sessions.get(clientId);
+    const relativePath = `${clientId}/${fileName}`  // Extract the relative part of the file path
+
+    if(ws)
+        ws.send(JSON.stringify({type: 'file', name: relativePath}));
+    else
+        console.log(`No active session for client ${clientId}`);
 }
 
 app.listen(8010)

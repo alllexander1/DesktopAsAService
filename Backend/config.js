@@ -1,6 +1,7 @@
 const config = {
     microphonePort: 8080,
-    vncPrinerAPI: 'ws://localhost:8010/vnc/printer'
+    vncPrinterAPI: 'ws://192.168.178.29:8010/vnc/printer',
+    filesDirectory: '/usr/src/app/files'
 };
 
 module.exports = config;

@@ -1,15 +1,15 @@
 import Guacamole from 'guacamole-common-js'
 import React from 'react'
-import './BaseStage.css'
-import Card from 'react-bootstrap/Card'
+import './GuacamoleStage.css'
 import Table from 'react-bootstrap/Table'
-import {Mic, MicMute, ChevronUp, ChevronDown} from 'react-bootstrap-icons'
+import {Mic, MicMute} from 'react-bootstrap-icons'
 import RDPClient from './clients/RDPClient'
-import PrintClient from './clients/PrintClient2'
-import AudioClient from './clients/AudioClient2'
+import PrintClient from './clients/PrintClient'
+import AudioClient from './clients/AudioClientLanczos'
 import config from './config'
+import Accordion from 'react-bootstrap/Accordion';
 
-class BaseStage extends React.Component {
+class GuacamoleStage extends React.Component {
 
     constructor(props){
         super(props);
@@ -41,7 +41,7 @@ class BaseStage extends React.Component {
     };
 
     componentDidMount(){
-        const tunnel = new Guacamole.WebSocketTunnel('ws://localhost:8080/');
+        const tunnel = new Guacamole.WebSocketTunnel(`ws://${config.backendURL}/`);
         const client = new Guacamole.Client(tunnel);
         this.myRef.current.appendChild(client.getDisplay().getElement());
 
@@ -60,6 +60,36 @@ class BaseStage extends React.Component {
             client.sendKeyEvent(0, keysym);
         };
 
+        client.onstatechange = (state) => {
+            if(state === 3){
+                this.setState({isLoading: false, error: false})
+                if(this.props.connection.type === 'RDP'){
+                    this.rdpManager = new RDPClient(client);
+                    this.updateAudioStatus('Audio/Microphone is managed by RDP')
+                    this.updatePrinterStatus('Using RDP printing')
+                    this.updatePrinterName('Guacamole Printer')
+                }
+                else{
+                    // Set up printer for VNC
+                    this.printClient = new PrintClient(config, config.userToken, `${this.props.connection.guest}`)
+                    this.printClient.connect();
+                    this.printClient.onStatusChange = (state) => {
+                        this.updatePrinterStatus(state)
+                    }
+                    this.printClient.onPathReceived = (path) => {
+                        this.updatePrinterName(path)
+                    }
+                    // Set up microphone for VNC
+                    this.audioClient = new AudioClient(config, config.userToken, `${this.props.connection.ip}`)
+                    this.audioClient.connect();
+                    this.audioClient.onStatusChange = (state) => {
+                        this.updateAudioStatus(state)
+                    }
+
+                }
+            }
+        }
+
         // Error handling
         tunnel.onerror = (error) => {
             this.setState({isLoading: false, error: true})
@@ -69,69 +99,23 @@ class BaseStage extends React.Component {
             this.setState({isLoading: false, error: true})
         }
 
-        // to delete 
-        this.audioClient = new AudioClient(config, '123', '192.168.178.28')
-        this.audioClient.connect();
-        this.audioClient.onStatusChange = (state) => {
-            this.updateAudioStatus(state)
-        }
-
-        this.printClient = new PrintClient(config, '123', 'tom_printer')
-        this.printClient.connect();
-        this.printClient.onPathReceived = (path) => {
-            this.updatePrinterName(path)
-        }
-        this.printClient.onStatusChange = (state) => {
-            this.updatePrinterStatus(state)
-        }
-        // until here
-
-        // On connect
-        client.onstatechange = (state) => {
-            if(state === 3){
-                this.setState({isLoading: false, error: false})
-                if(this.props.connection.type === 'RDP'){
-                    this.rdpManager = new RDPClient(client);
-                    this.updateAudioStatus('Audio is managed by RDP')
-                    this.updatePrinterStatus('Using RDP printing')
-                    this.updatePrinterName('Guacamole Printer')
-                }
-                else{
-                    /*
-                    this.vncPrinter = new PrintClient('192.168.178.29', 8010, 'tom_printer')
-                    this.vncPrinter.connect();
-            
-                    this.vncPrinter.onStatusChange = (state) => {
-                        this.updatePrinterStatus(state)
-                    }
-
-                    this.vncPrinter.onPathReceived = (path) => {
-                        this.updatePrinterName(path)
-                    }
-                    
-            
-                    this.audioClient = new AudioClient('192.168.178.28', 'ws://localhost:8020/');
-                    this.audioClient.connect();
-                    this.audioClient.onStatusChange = (state) => {
-                        this.updateAudioStatus(state)
-                    }
-                    */
-                }
-            }
-        }
-
-        client.connect('token='+this.token); 
+        client.connect('token='+this.token+'&GUAC_AUDIO=audio/L16'); 
 
         this.client = client;
+        this.keyboard = keyboard;
+        this.mouse = mouse;
     }
 
-
     componentWillUnmount(){
+        this.keyboard.onkeydown = null;
+        this.keyboard.onkeyup = null;
+        this.mouse.onEach = null;
         this.client.disconnect();
         if(this.audioClient)
             this.audioClient.disconnect();
         if(this.vncPrinter)
             this.vncPrinter.disconnect();
+        
     }
 
     toggleAudio = (event) => {
@@ -145,22 +129,15 @@ class BaseStage extends React.Component {
         });
     }
 
-    toggleTaskbar = () => {
-        this.setState((prevState) => ({
-            taskbarCollapsed: !prevState.taskbarCollapsed
-        }));
-    }
-
     
     render(){
         return(
+            
             <div>
-                <button onClick={this.toggleTaskbar} className="btn btn-primary mb-1">
-                    {this.state.taskbarCollapsed ? 'Show taskbar' : 'Hide taskbar'} {this.state.taskbarCollapsed ? <ChevronDown /> : <ChevronUp />}
-                </button>
-                {!this.state.taskbarCollapsed && (
-                <Card className='taskbar'>
-                    <div className='d-flex justify-content-around align-items-start m-2'>
+                <Accordion defaultActiveKey="0" className='mx-auto mb-2'>
+                    <Accordion.Item eventKey="0">
+                        <Accordion.Header>Toolbar</Accordion.Header>
+                        <Accordion.Body className='d-flex justify-content-around align-items-start m-2'>
                         <div>
                             <span className='heading'>Connection Info:</span>
                             <Table striped bordered hover size='sm'>
@@ -177,18 +154,14 @@ class BaseStage extends React.Component {
                                     </tr>
                                     <tr>
                                         <td>Machine Address</td>
-                                        <td>{this.props.connection.address}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Operating System</td>
-                                        <td>{this.props.connection.os}</td>
+                                        <td>{this.props.connection.ip}</td>
                                     </tr>
                                 </tbody>
                             </Table>
                         </div>
                         <div>
                             <span className='heading'>Audio:</span>
-                            <button disabled={this.props.connection.type==='RDP' || this.state.audioStatus != 'ready'} style={{marginBottom: '10px'}} className={this.state.audioEnabled ? 'btn btn-success' : 'btn btn-danger'} onClick={this.toggleAudio}>
+                            <button disabled={this.props.connection.type==='RDP' || this.state.audioStatus !== 'ready'} style={{marginBottom: '10px'}} className={this.state.audioEnabled ? 'btn btn-success' : 'btn btn-danger'} onClick={this.toggleAudio}>
                                 {this.state.audioEnabled ? <Mic /> : <MicMute />}
                             </button>
                             <br/>
@@ -200,9 +173,9 @@ class BaseStage extends React.Component {
                             <br/>
                             <span>Printer path: {this.state.printerName}</span>
                         </div>
-                    </div>       
-                </Card>
-                )}
+                        </Accordion.Body>
+                    </Accordion.Item>
+                </Accordion>
                 <div ref={this.myRef} />
                 {this.state.isLoading && (
                     <div className='loading-overlay'>
@@ -211,12 +184,12 @@ class BaseStage extends React.Component {
                 )}
                 {this.state.error && (
                     <div className='error-overlay'>
-                    <span>An error occured</span>
-                </div>
+                        <span style={{color: 'red'}}>An error occured</span>
+                    </div>
                 )}
             </div>      
         );
     }
 
 }
-export default BaseStage;
+export default GuacamoleStage;

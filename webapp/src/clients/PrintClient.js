@@ -1,14 +1,13 @@
 class PrintClient{
 
-    constructor(serverIP, serverPort, id){
-        this.serverIP = serverIP;
-        this.serverPort = serverPort;
+    constructor(config, token, id){
+        this.config = config;
+        this.token = token;
         this.id = id;
-        this._path = ''
+        this._path = '';
         this._status = 'not connected';
         this.onStatusChange = null;
         this.onPathReceived = null;
-        this.onFile = this.downloadFile;
     }
 
     set path(path) {
@@ -31,14 +30,9 @@ class PrintClient{
         return this._status;
     }
 
+    // Connect to proxy and handle messages
     connect(){
-        this.socket = new WebSocket(`ws://${this.serverIP}:${this.serverPort}`);
-
-        // When connected, send the printer ID
-        this.socket.onopen = () => {
-            this.status = 'connected'
-            this.socket.send(this.id)
-        }
+        this.socket = new WebSocket(`${this.config.printerAPI}?token=${this.token}&id=${this.id}`);
 
         this.socket.onerror = () => {
             this.status = 'error'
@@ -48,25 +42,28 @@ class PrintClient{
             this.status = 'connection closed'
         }
 
-        // Invoked when a file path for downloading is received
-        this.socket.onmessage = (m) => {
-            const data = JSON.parse(m.data);
-            if (data.printer_path) {
-                this.path =  `http://${this.serverIP}:631/${data.printer_path}`
+        // On Message
+        this.socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            const type = message.type;
+
+            if(type === 'status'){
+                this.status = message.status;
+            }
+            else if(type === 'printer_path'){
+                this.path = this.config.cupsAddress + message.printer_path
                 this.status = 'printer is running'
-            } else if (data.file_path) {
-                const absPath = `http://${this.serverIP}:${this.serverPort}/` + data.file_path;
-                console.log(absPath)
-                //this.downloadFile(absPath);
-                this.onFile(absPath);
+            }
+            else if(type === 'file'){
+                this.fileName = message.name;
+                const fetch_path = this.config.fileFetchAPI + this.fileName;
+                this.downloadFile(fetch_path);
             }
         }
+
     }
 
-    disconnect(){
-        this.socket.close();
-    }
-
+    // Download file from backend
     downloadFile = function(path) {
         fetch(path)
         .then(response => response.blob())
@@ -82,5 +79,10 @@ class PrintClient{
         })
         .catch(error => console.error('Error downloading file:', error));
     }
+
+    disconnect(){
+        this.socket.close();
+    }
 }
+
 export default PrintClient;

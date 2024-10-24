@@ -1,16 +1,19 @@
+// Imports
+const enableWs = require('express-ws')
+const WebSocket = require('ws')
+const cors = require('cors');
+const config = require('./config')
+const {spawn} = require('child_process')
+
+// Guacamole Server
 const GuacamoleLite = require('guacamole-lite');
 const express = require('express');
 const http = require('http');
-const PrintServer = require('./servers/PrintServer2');
-const cors = require('cors');
-const AudioServer = require('./servers/AudioServer');
 
+const guacamoleApp = express();
 
-const app = express();
-app.use(cors())
+const server = http.createServer(guacamoleApp);
 
-
-// Guacamole Server
 const guacdOptions = {
     host: '192.168.178.31',
     port: 4822
@@ -20,36 +23,119 @@ const clientOptions = {
     crypt: {
         cypher: 'AES-256-CBC',
         key: 'MySuperSecretKeyForParamsToken12'
+    },
+    connectionDefaultSettings: {
+        test: 'test'
     }
 };
 
-const guacHttpServer = http.createServer(app);
 const guacServer = new GuacamoleLite(
-    {guacHttpServer},
+    {server},
     guacdOptions,
-    clientOptions,
+    clientOptions
+    //callbacks
 );
 
-guacHttpServer.listen(8000);
+server.listen(8000);
 
 
-// Print Server
-app.use(express.json())
-app.use('/files', express.static('C:\\Users\\alexa\\Desktop\\Masterarbeit\\out'))
-const printHttpServer = http.createServer(app);
-const printServer = new PrintServer(printHttpServer, app)
-setup(printServer)
-printHttpServer.listen(8010, () => {
-    console.log('Print Server is up.')
+// Backend Server
+const app = express();
+enableWs(app);
+app.use(express.json());
+
+
+app.ws('/vnc/printer', (ws, req) => {
+    const token = req.query.token;
+    const userID = req.query.id;
+    console.log(`New print client connection: token=${token}, id=${userID}`)
+
+    // Validate token
+    console.log('connecting to ' + `${config.vncPrinterAPI}?id=${userID}`)
+    const proxy = new WebSocket(`${config.vncPrinterAPI}?id=${userID}`);
+    
+    ws.onmessage = (m) => {
+        proxy.send(m.data)  // Forward to printer container
+    }
+
+    proxy.onmessage = (m) => {
+        ws.send(m.data) // Forward to web-client
+    }
+
+    proxy.onerror = (e) => {
+        console.log("Error")
+    }
+
+    ws.on('close', () => {
+        console.log('Printer connection closed')
+        proxy.close();
+    })
+    proxy.on('close', () => {
+        console.log('Proxy closed')
+    })
 })
 
-async function setup(printServer){
-    await printServer.init();
-}
+// Microphone API
+app.ws('/vnc/audio', (ws, req) => {
+    const token = req.query.token;
+    const destination = req.query.destination;
+    console.log(`New Audio client connection: token=${token}, destination=${destination}`);
 
-// Sound Server
-const audioHttpServer = http.createServer(app);
-const audioServer = new AudioServer(audioHttpServer);
-audioHttpServer.listen(8020, () => {
-    console.log('Audio Server is up.')
-})
+    ws.send('connected');
+
+    // Pacat process
+    const pacatProcess = spawn('pacat', [
+        '--server', `${destination}:${config.microphonePort}`,      // PulseAudio server address
+        '--device', 'virtual_speaker',                              // Name of the virtual microphone
+        '--format', 's16le',                                        // Audio format (L16)
+        '--rate', '44100',                                          // Sample rate
+        '--channels', '1',                                          // Stereo
+        '--latency-msec', '100',                                    // Target latency
+    ]);
+
+    pacatProcess.on('error', (error) => {
+        console.error('Error starting pacat:', error.message);
+        ws.send('Error: ' + error.message);
+        ws.close();
+    });
+
+    pacatProcess.on('close', (code) => {
+        console.log('pacat process exited with code', code);
+        if (ws.readyState === ws.OPEN) {
+            ws.send('pacat process closed');
+        }
+        ws.close();
+    });
+
+    ws.on('message', (data) => {
+        if (!pacatProcess.stdin.writable) {
+            console.log('pacat stdin is not writable');
+            return;
+        }
+        pacatProcess.stdin.write(data);  // Send audio chunks to pacat
+    });
+
+    ws.on('close', () => {
+        console.log('WebSocket client disconnected');
+        pacatProcess.stdin.end(); // Close pacat's stdin
+    });
+
+    // Handle WebSocket errors
+    ws.on('error', (error) => {
+        console.error('WebSocket error:', error.message);
+        pacatProcess.stdin.end(); // Close pacat's stdin
+    });
+    
+});
+
+// Serve Frontend
+app.use(express.static('./public'));
+
+// Fetch
+app.use(cors())
+app.use('/files', express.static(config.filesDirectory))
+
+// Start the API server on port 8090
+app.listen(3000, () => {
+    console.log('API server listening on port 8090');
+});
