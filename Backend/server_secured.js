@@ -5,6 +5,15 @@ const cors = require('cors');
 const config = require('./config')
 const {spawn} = require('child_process')
 
+const https = require('https');
+const fs = require('fs');
+
+// SSL credentials
+const sslOptions = {
+    key: fs.readFileSync(config.keyPath),
+    cert: fs.readFileSync(config.certPath)
+};
+
 // Guacamole Server
 const GuacamoleLite = require('guacamole-lite');
 const express = require('express');
@@ -12,7 +21,7 @@ const http = require('http');
 
 const guacamoleApp = express();
 
-const server = http.createServer(guacamoleApp);
+const server = https.createServer(sslOptions, guacamoleApp);
 
 const guacdOptions = {
     host: '192.168.178.31',
@@ -41,7 +50,8 @@ server.listen(8000);
 
 // Backend Server
 const app = express();
-enableWs(app);
+const backendServer = https.createServer(sslOptions, app);
+enableWs(app, backendServer);
 app.use(express.json());
 
 
@@ -64,6 +74,7 @@ app.ws('/vnc/printer', (ws, req) => {
 
     proxy.onerror = (e) => {
         ws.send(JSON.stringify({type: 'status', status: 'Proxy closed'}))
+        console.log("Error")
     }
 
     ws.on('close', () => {
@@ -71,6 +82,7 @@ app.ws('/vnc/printer', (ws, req) => {
         proxy.close();
     })
     proxy.on('close', () => {
+        console.log('Print connection to cups closed')
         ws.send(JSON.stringify({type: 'status', status: 'Cannot reach print server'}))
     })
 })
@@ -112,30 +124,29 @@ app.ws('/vnc/audio', (ws, req) => {
             console.log('pacat stdin is not writable');
             return;
         }
-        pacatProcess.stdin.write(data);  // Send audio chunks to pacat
+        pacatProcess.stdin.write(data);
     });
 
     ws.on('close', () => {
         console.log('WebSocket client disconnected');
-        pacatProcess.stdin.end(); // Close pacat's stdin
+        pacatProcess.stdin.end();
     });
 
-    // Handle WebSocket errors
     ws.on('error', (error) => {
         console.error('WebSocket error:', error.message);
-        pacatProcess.stdin.end(); // Close pacat's stdin
+        pacatProcess.stdin.end();
     });
     
 });
 
 // Serve Frontend
-app.use(express.static('./public'));
+app.use(express.static(config.webapp));
 
 // Fetch
 app.use(cors())
 app.use('/files', express.static(config.filesDirectory))
 
 // Start the API server on port 8090
-app.listen(3000, () => {
+backendServer.listen(8090, () => {
     console.log('API server listening on port 8090');
 });

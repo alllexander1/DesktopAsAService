@@ -1,9 +1,11 @@
+const host = 'localhost';
+
 const config = {
-    printerAPI: 'ws://localhost:3000/vnc/printer',
-    microphoneAPI: 'ws://localhost:3000/vnc/audio',
-    fileFetchAPI: 'http://localhost:3000/files/',
-    cupsAddress: 'ipp://<VNC_Service_Host>:631',
-    backendURL: 'localhost:8000',
+    printerAPI: `wss://${host}:8090/vnc/printer`,
+    microphoneAPI: `wss://${host}:8090/vnc/audio`,
+    fileFetchAPI: `https://${host}:8090/files/`,
+    cupsAddress: `ipp://<cups_host>:631`,
+    backendURL: `${host}:8000`,
     userToken: '123' // not relevant
 };
 

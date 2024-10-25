@@ -26,7 +26,7 @@ RUN dos2unix ./scripts/create_printer.sh ./scripts/delete_printer.sh ./scripts/p
 
 COPY /scripts/cupsd.conf /etc/cups/cupsd.conf
 
-RUN chmod -R 777 ./scripts/postprocess.sh
+RUN chmod -R 777 ./scripts/postprocess.sh ./scripts/create_printer.sh ./scripts/delete_printer.sh
 
 EXPOSE 8010
 EXPOSE 631

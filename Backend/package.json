@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "startDev": "nodemon index.js",
-    "startTest": "nodemon guacamole-server.js",
-    "startMock": "nodemon mockup.js"
+    "startTest": "nodemon server_secured.js"
   },
   "author": "",
   "license": "ISC",

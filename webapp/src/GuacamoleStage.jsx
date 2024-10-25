@@ -41,7 +41,7 @@ class GuacamoleStage extends React.Component {
     };
 
     componentDidMount(){
-        const tunnel = new Guacamole.WebSocketTunnel(`ws://${config.backendURL}/`);
+        const tunnel = new Guacamole.WebSocketTunnel(`wss://${config.backendURL}/`);
         const client = new Guacamole.Client(tunnel);
         this.myRef.current.appendChild(client.getDisplay().getElement());
 

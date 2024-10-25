@@ -25,4 +25,4 @@ EXPOSE 8090
 EXPOSE 8080
 
 # Start the backend server
-CMD [ "node", "guacamole-server.js" ]
+CMD [ "node", "server_secured.js" ]
