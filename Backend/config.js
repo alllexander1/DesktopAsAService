@@ -4,7 +4,9 @@ const config = {
     filesDirectory: '/usr/src/app/files',
     certPath: './certificate/cert.crt',
     keyPath: './certificate/cert.key',
-    webapp: './public'
+    webapp: './public',
+    guacdHost: '192.168.178.31',
+    guacdPort: '4822'
 };
 
 module.exports = config;

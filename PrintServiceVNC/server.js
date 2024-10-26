@@ -6,8 +6,9 @@ const app = express()
 enableWs(app)
 app.use(express.json())
 
-var sessions = new Map();
+var sessions = new Map();   // Map the user IDs to the WS connections
 
+// Register a printer if not registered
 app.ws('/vnc/printer', async (ws, req) => {
     const userID = req.query.id;
     console.log(`New print client connection: id=${userID}`)
@@ -26,7 +27,7 @@ app.ws('/vnc/printer', async (ws, req) => {
     })
 })
 
-// For notifications that pdf is created
+// API for notifications that a PDF has been created
 app.post('/api/vnc/file', (req, res) => {
     const data = req.body;
     console.log('New file: ' + data['message'])
@@ -34,6 +35,7 @@ app.post('/api/vnc/file', (req, res) => {
     res.json({ status: 'Path processed'});
 });
 
+// Create the printer within a subprocess
 async function createPrinter(name){
     console.log('Creating printer: ' + name);
     const path = `/usr/src/app/scripts/create_printer.sh ${name}`
@@ -51,6 +53,7 @@ async function createPrinter(name){
     });
 }
 
+// Extract the relevant data from the file path
 function handlePath(path){
     const clientId = path.split('/')[5];    // Extract the client id from the path
     const fileName = path.split('/')[6];

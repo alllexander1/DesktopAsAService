@@ -30,13 +30,13 @@ const tokenObject = {
     connection: {
         type: "vnc",
         settings: {
-            "hostname": "192.168.1.3",
+            "hostname": "192.168.178.28",
             "username": "alex",
             "password": "vnc",
             "security": "any",
             "ignore-cert": true,
             "enable-audio": true,
-            "audio-servername": "192.168.1.3"
+            "audio-servername": "192.168.178.28"
         }
     }
 };
@@ -65,4 +65,5 @@ const originalToken = JSON.stringify(tokenObject, null, 2);
 const token = encryptToken(tokenObject);
 const urlencodedToken = encodeURIComponent(token);
 
+console.log('Use this token:')
 console.log(`${urlencodedToken}`)
