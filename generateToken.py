@@ -70,15 +70,5 @@ def encrypt_token(value):
 
 token = encrypt_token(token_object)
 
-print("Parameters:")
-print(json.dumps(token_object, indent=4))
-
-print("\n\n")
-
-print("Encrypted token:")
+print("Use this token:")
 print(token)
-
-print("\n\n")
-
-print("Use this token in the URL:")
-print("ws://localhost:8080/?token=" + token)
