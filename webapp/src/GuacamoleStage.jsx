@@ -9,6 +9,10 @@ import AudioClient from './clients/AudioClientLanczos'
 import config from './config'
 import Accordion from 'react-bootstrap/Accordion';
 
+/*
+This component represents the remote desktop viewer. It implements graphic transmittion remote control, 
+audio transmittion, printing option and file transfer (only for RDP). 
+*/
 class GuacamoleStage extends React.Component {
 
     constructor(props){
@@ -61,7 +65,7 @@ class GuacamoleStage extends React.Component {
         };
 
         client.onstatechange = (state) => {
-            if(state === 3){
+            if(state === 3){    // When connected
                 this.setState({isLoading: false, error: false})
                 if(this.props.connection.type === 'RDP'){
                     this.rdpManager = new RDPClient(client);

@@ -4,7 +4,9 @@ import Accordion from 'react-bootstrap/Accordion';
 import React, { useEffect, useState } from 'react';
 import GuacamoleStage from './GuacamoleStage.jsx';
 
-
+/*
+Main component of the app. Incudes the connection form and a GuacamoleStage component.
+*/
 function App() {
 
   const [connection, setConnection] = useState({

@@ -1,3 +1,7 @@
+/*
+This class represents a printing client for VNC connections. It establishes a websocket connection to the backend 
+and waits for new files. If a message for a new file is received, the file is automatically downloaded.
+*/
 class PrintClient{
 
     constructor(config, token, id){
@@ -47,14 +51,17 @@ class PrintClient{
             const message = JSON.parse(event.data);
             const type = message.type;
 
+            // Received message is status change
             if(type === 'status'){
                 this.status = message.status;
             }
+            // Received message is the printer path
             else if(type === 'printer_path'){
                 this.path = this.config.cupsAddress + message.printer_path
                 this.status = 'printer is running'
             }
-            else if(type === 'file'){
+            // Received message a file path
+            else if(type === 'file'){   
                 this.fileName = message.name;
                 const fetch_path = this.config.fileFetchAPI + this.fileName;
                 this.downloadFile(fetch_path);

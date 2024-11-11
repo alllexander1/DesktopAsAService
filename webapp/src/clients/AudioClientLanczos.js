@@ -1,3 +1,8 @@
+
+/*
+This class represents an Audio Client for VNC connections. It establish a websocket connection to the backend and
+sends audio data. The lanczos interpolation is applied on the audio data.
+*/
 class AudioClient {
 
     constructor(config, token, destination){
@@ -94,7 +99,7 @@ class AudioClient {
                 const length = Math.floor(audioBuffer.length * resampleRatio);
                 const resampledData = new Float32Array(length);
 
-                const inputChannelData = audioBuffer.getChannelData(0); // assuming mono
+                const inputChannelData = audioBuffer.getChannelData(0);
                 for (let i = 0; i < length; i++) {
                     const t = i / (length - 1);
                     resampledData[i] = interpolateSample(inputChannelData, t);

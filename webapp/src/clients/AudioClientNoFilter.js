@@ -1,3 +1,6 @@
+/*
+Same as AudioClientLanczos but with no Lanczos interpolation
+*/
 class AudioClient {
 
     constructor(config, token, destination){
